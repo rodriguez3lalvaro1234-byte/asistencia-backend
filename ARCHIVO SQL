@@ -1,0 +1,56 @@
+-- ===============================
+-- TABLA: usuarios
+-- ===============================
+CREATE TABLE usuarios (
+    id SERIAL PRIMARY KEY,
+    dni VARCHAR(15) UNIQUE NOT NULL,
+    nombre VARCHAR(120) NOT NULL,
+    apellido VARCHAR(120) NOT NULL,
+    correo VARCHAR(120),
+    telefono VARCHAR(20),
+    cargo VARCHAR(120),
+    password_hash TEXT NOT NULL,
+    foto_url TEXT,
+    estado BOOLEAN DEFAULT TRUE, -- activo/inactivo
+    creado_en TIMESTAMP DEFAULT NOW()
+);
+
+-- ===============================
+-- TABLA: horarios
+-- ===============================
+CREATE TABLE horarios (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER NOT NULL,
+    hora_entrada TIME NOT NULL,
+    hora_salida TIME NOT NULL,
+    creado_en TIMESTAMP DEFAULT NOW(),
+
+    CONSTRAINT fk_horarios_usuario
+    FOREIGN KEY (usuario_id)
+    REFERENCES usuarios(id)
+    ON DELETE CASCADE
+);
+
+-- ===============================
+-- TABLA: asistencias
+-- ===============================
+CREATE TABLE asistencias (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER NOT NULL,
+    fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+    hora_entrada TIME,
+    hora_salida TIME,
+    tardanza BOOLEAN DEFAULT FALSE,
+    horas_trabajadas INTERVAL,
+    observacion TEXT,
+    creado_en TIMESTAMP DEFAULT NOW(),
+
+    CONSTRAINT fk_asistencias_usuario
+    FOREIGN KEY (usuario_id)
+    REFERENCES usuarios(id)
+    ON DELETE CASCADE
+);
+
+-- Índices recomendados para rendimiento
+CREATE INDEX idx_asistencias_usuario ON asistencias(usuario_id);
+CREATE INDEX idx_horarios_usuario ON horarios(usuario_id);
